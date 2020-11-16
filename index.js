@@ -57,8 +57,8 @@ app.get('/:label', (req, res) => {
 })
 
 app.get('/img', async (req, res) => {
-  if (labelTypes.includes(req.query.labelType) && /[a-zA-Z0-9]/.test(req.query.labelText)) {
-    const file = path.join(tmpDir, `${req.query.labelType}-${req.query.labelText}.png`)
+  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && /[a-zA-Z0-9]/.test(req.query.labelText)) {
+    const file = path.join(tmpDir, `${req.query.labelType || 'default'}-${req.query.labelText}.png`)
 
     if (!fs.existsSync(file)) {
       const browser = await puppeteer.launch()
