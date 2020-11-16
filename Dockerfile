@@ -13,6 +13,11 @@ WORKDIR /app
 COPY . .
 RUN yarn install
 
+RUN groupadd user \
+ && useradd -g user user \
+ && chown user:user -R /app
+USER user
+
 VOLUME ./tmp
 EXPOSE 3000
 
