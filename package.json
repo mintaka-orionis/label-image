@@ -1,0 +1,19 @@
+{
+  "name": "label-image",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development node-dev index.js"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.2",
+    "express": "^4.17.1",
+    "pug": "^3.0.0",
+    "puppeteer": "^5.5.0"
+  },
+  "devDependencies": {
+    "node-dev": "^6.2.0"
+  }
+}
