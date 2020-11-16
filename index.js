@@ -35,7 +35,7 @@ app.get('/style.css', (req, res) => {
 
 
 app.get('/', (req, res) => {
-  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && /[a-zA-Z0-9]/.test(req.query.labelText)) {
+  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && /^[a-zA-Z0-9]{1,100}$/.test(req.query.labelText)) {
     res.render('index', { labelType: req.query.labelType ? `label-${req.query.labelType}` : 'label-default', labelText: req.query.labelText })
   } else {
     res.sendStatus(400)
@@ -57,7 +57,7 @@ app.get('/:label', (req, res) => {
 })
 
 app.get('/img', async (req, res) => {
-  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && /[a-zA-Z0-9]/.test(req.query.labelText)) {
+  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && /^[a-zA-Z0-9]{1,100}$/.test(req.query.labelText)) {
     const file = path.join(tmpDir, `${req.query.labelType || 'default'}-${req.query.labelText}.png`)
 
     if (!fs.existsSync(file)) {
