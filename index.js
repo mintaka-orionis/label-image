@@ -42,20 +42,6 @@ app.get('/', (req, res) => {
   }
 })
 
-app.get('/:label', (req, res) => {
-  if (req.params.label) {
-    const labelType = labelMap[req.params.label]
-
-    if (labelType) {
-      res.render('index', { labelType: `label-${labelType}`, labelText: req.params.label })
-    } else {
-      res.sendStatus(404)
-    }
-  } else {
-    res.sendStatus(404)
-  }
-})
-
 app.get('/img', async (req, res) => {
   if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && /^[a-zA-Z0-9]{1,100}$/.test(req.query.labelText)) {
     const file = path.join(tmpDir, `${req.query.labelType || 'default'}-${req.query.labelText}.png`)
@@ -75,6 +61,7 @@ app.get('/img', async (req, res) => {
     res.sendStatus(400)
   }
 })
+
 app.get('/img/:label', async (req, res) => {
   if (req.params.label) {
     if (labelMap[req.params.label]) {
@@ -91,6 +78,20 @@ app.get('/img/:label', async (req, res) => {
       }
 
       res.sendFile(file)
+    } else {
+      res.sendStatus(404)
+    }
+  } else {
+    res.sendStatus(404)
+  }
+})
+
+app.get('/:label', (req, res) => {
+  if (req.params.label) {
+    const labelType = labelMap[req.params.label]
+
+    if (labelType) {
+      res.render('index', { labelType: `label-${labelType}`, labelText: req.params.label })
     } else {
       res.sendStatus(404)
     }
