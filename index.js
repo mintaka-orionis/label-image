@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
+const morgan = require('morgan')
 const puppeteer = require('puppeteer')
 const app = express()
 const host = '0.0.0.0'
@@ -22,6 +23,8 @@ const labelMap = {
 const tmpDir = path.join(__dirname, 'tmp')
 
 app.set('view engine', 'pug')
+
+app.use(morgan('combined'))
 
 app.get('/ress.min.css', (req, res) => {
   res.sendFile(path.join(__dirname, 'css', 'ress.min.css'))
@@ -60,7 +63,7 @@ app.get('/img', async (req, res) => {
     if (!fs.existsSync(file)) {
       const browser = await puppeteer.launch()
       const page = (await browser.pages())[0]
-      await page.goto(`http://${host}:${port}/?labelType=${req.query.labelType}&labelText=${req.query.labelText}`)
+      await page.goto(`http://localhost:${port}/?labelType=${req.query.labelType}&labelText=${req.query.labelText}`)
       const label = await page.$('#label')
       if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
       await label.screenshot({path: file, omitBackground: true})
@@ -80,7 +83,7 @@ app.get('/img/:label', async (req, res) => {
       if (!fs.existsSync(file)) {
         const browser = await puppeteer.launch()
         const page = (await browser.pages())[0]
-        await page.goto(`http://${host}:${port}/${req.params.label}`)
+        await page.goto(`http://localhost:${port}/${req.params.label}`)
         const label = await page.$('#label')
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
         await label.screenshot({path: file, omitBackground: true})

@@ -1,6 +1,6 @@
 {
   "name": "label-image",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -10,6 +10,7 @@
   "dependencies": {
     "cross-env": "^7.0.2",
     "express": "^4.17.1",
+    "morgan": "^1.10.0",
     "pug": "^3.0.0",
     "puppeteer": "^5.5.0"
   },
