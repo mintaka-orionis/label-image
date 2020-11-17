@@ -49,7 +49,7 @@ async function getPage() {
   let page
   try {
     page = await browser.newPage()
-    page.setDefaultNavigationTimeout(1000)
+    page.setDefaultNavigationTimeout(5000)
     puppeteerReLaunchCounter = 0
 
     const pages = await browser.pages()
@@ -108,17 +108,22 @@ app.get('/img', async (req, res) => {
     const file = path.join(tmpDir, `${req.query.labelType || 'default'}-${req.query.labelText}.png`)
 
     if (!fs.existsSync(file)) {
-      const page = await getPage()
-      await page.goto(`http://localhost:${port}/?${req.query.labelType == null ? '' : `labelType=${req.query.labelType}&`}labelText=${req.query.labelText}`)
-      const label = await page.$('#label')
-      if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
-      const image = await label.screenshot({path: file, omitBackground: true})
-      res.writeHead(200, {
-        'Content-Type': 'image/png',
-        'Content-Length': image.length
-      })
-      res.end(image)
-      await page.close()
+      try {
+        const page = await getPage()
+        await page.goto(`http://localhost:${port}/?${req.query.labelType == null ? '' : `labelType=${req.query.labelType}&`}labelText=${req.query.labelText}`)
+        const label = await page.$('#label')
+        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
+        const image = await label.screenshot({path: file, omitBackground: true})
+        res.writeHead(200, {
+          'Content-Type': 'image/png',
+          'Content-Length': image.length
+        })
+        res.end(image)
+        await page.close()
+      } catch (err) {
+        console.error(err.stack)
+        res.sendStatus(500)
+      }
     } else {
       res.sendFile(file)
     }
@@ -133,17 +138,22 @@ app.get('/img/:label', async (req, res) => {
       const file = path.join(tmpDir, `${req.params.label}.png`)
 
       if (!fs.existsSync(file)) {
-        const page = await getPage()
-        await page.goto(`http://localhost:${port}/${req.params.label}`)
-        const label = await page.$('#label')
-        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
-        const image = await label.screenshot({path: file, omitBackground: true})
-        res.writeHead(200, {
-          'Content-Type': 'image/png',
-          'Content-Length': image.length
-        })
-        res.end(image)
-        await page.close()
+        try {
+          const page = await getPage()
+          await page.goto(`http://localhost:${port}/${req.params.label}`)
+          const label = await page.$('#label')
+          if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
+          const image = await label.screenshot({path: file, omitBackground: true})
+          res.writeHead(200, {
+            'Content-Type': 'image/png',
+            'Content-Length': image.length
+          })
+          res.end(image)
+          await page.close()
+        } catch (err) {
+          console.error(err.stack)
+          res.sendStatus(500)
+        }
       } else {
         res.sendFile(file)
       }
