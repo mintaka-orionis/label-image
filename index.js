@@ -1,8 +1,10 @@
+const crypto = require('crypto')
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const morgan = require('morgan')
 const puppeteer = require('puppeteer')
+const validator = require('validator')
 const app = express()
 const host = '0.0.0.0'
 const port = 3000
@@ -93,24 +95,28 @@ app.get('/style.css', (req, res) => {
   res.sendFile(path.join(__dirname, 'css', 'style.css'))
 })
 
-const labelTextRegex = /^[\x20-\x7e]{1,100}$/
-
 app.get('/', (req, res) => {
-  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && labelTextRegex.test(req.query.labelText)) {
-    res.render('index', { labelType: req.query.labelType ? `label-${req.query.labelType}` : 'label-default', labelText: req.query.labelText })
+  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null)) {
+    const labelType = `label-${req.query.labelType || 'default'}`
+    const labelText = req.query.labelText == null ? '' : validator.stripLow(req.query.labelText)
+
+    res.render('index', { labelType, labelText })
   } else {
     res.sendStatus(400)
   }
 })
 
 app.get('/img', async (req, res) => {
-  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null) && labelTextRegex.test(req.query.labelText)) {
-    const file = path.join(tmpDir, `${req.query.labelType || 'default'}-${req.query.labelText}.png`)
+  if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null)) {
+    const labelType = req.query.labelType || 'default'
+    const labelText = req.query.labelText == null ? '' : validator.stripLow(req.query.labelText)
+    const fileName = crypto.createHash('sha256').update(`${labelType}-${labelText}`, 'utf8').digest('hex')
+    const file = path.join(tmpDir, `${fileName}.png`)
 
     if (!fs.existsSync(file)) {
       try {
         const page = await getPage()
-        await page.goto(`http://localhost:${port}/?${req.query.labelType == null ? '' : `labelType=${req.query.labelType}&`}labelText=${req.query.labelText}`)
+        await page.goto(`http://localhost:${port}/?labelType=${labelType}&labelText=${labelText}`)
         const label = await page.$('#label')
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
         const image = await label.screenshot({path: file, omitBackground: true})
