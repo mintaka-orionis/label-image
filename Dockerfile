@@ -4,6 +4,9 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     curl \
     git \
+    fonts-noto \
+    fonts-noto-cjk \
+    fonts-noto-color-emoji \
  && apt-get -y clean \
  && rm -rf /var/lib/apt/lists/* \
  && curl -o- -L https://yarnpkg.com/install.sh | sh
