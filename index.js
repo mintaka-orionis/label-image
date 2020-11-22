@@ -100,6 +100,8 @@ app.get('/', (req, res) => {
     const labelType = `label-${req.query.labelType || 'default'}`
     const labelText = req.query.labelText == null ? '' : validator.stripLow(req.query.labelText)
 
+    if (labelText.length > 128) return res.sendStatus(400)
+
     res.render('index', { labelType, labelText })
   } else {
     res.sendStatus(400)
@@ -110,6 +112,9 @@ app.get('/img', async (req, res) => {
   if ((labelTypes.includes(req.query.labelType) || req.query.labelType == null)) {
     const labelType = req.query.labelType || 'default'
     const labelText = req.query.labelText == null ? '' : validator.stripLow(req.query.labelText)
+
+    if (labelText.length > 128) return res.sendStatus(400)
+
     const fileName = crypto.createHash('sha256').update(`${labelType}-${labelText}`, 'utf8').digest('hex')
     const file = path.join(tmpDir, `${fileName}.png`)
 
